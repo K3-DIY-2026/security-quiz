@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>情報セキュリティ リテラシークイズ</title>
+  
+  <!-- アプリアイコン設定 -->
+  <link rel="icon" href="quiz_app_icon.png">
+  <link rel="apple-touch-icon" href="quiz_app_icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 背景アニメーション用の要素 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <main id="app-container">
+    
+    <!-- スタート画面 -->
+    <section id="start-screen" class="screen glass-panel active">
+      <div class="icon-container">
+        <img src="quiz_app_icon.png" alt="App Icon" class="title-icon-img">
+      </div>
+      <h1 class="gradient-text">情報セキュリティ<br>リテラシークイズ</h1>
+      
+      <p class="description">
+        日々の業務に不可欠な情報の取り扱いや<br>PCの基礎知識を楽しく学ぶアプリです。
+      </p>
+
+      <!-- ルール説明 -->
+      <div class="rules-container">
+        <h3 class="rules-title">📜 ルール</h3>
+        <ul class="rules-list">
+          <li><strong>全10問</strong>の4択形式クイズです。</li>
+          <li><span class="text-danger">1問でも間違えると即終了</span>のサバイバル形式となります。</li>
+        </ul>
+      </div>
+      
+      <!-- ジャンル選択UI -->
+      <div class="genre-selection">
+        <label for="genre-select" class="genre-label">挑戦するジャンルを選択</label>
+        <div class="select-wrapper">
+          <select id="genre-select" class="glass-select">
+            <option value="all">🌟 オールジャンル (完全シャッフル)</option>
+            <option value="情報セキュリティ">🔒 情報セキュリティ</option>
+            <option value="Windows基礎">💻 Windows基礎</option>
+            <option value="ショートカットキー">⌨️ ショートカットキー</option>
+            <option value="MS Office基礎">📊 MS Office基礎</option>
+            <option value="ビジネス実務">💼 ビジネス実務</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="start-btn" class="btn btn-primary">クイズを始める</button>
+    </section>
+
+    <!-- クイズ画面 -->
+    <section id="quiz-screen" class="screen">
+      <div class="quiz-header">
+        <span id="question-counter" class="counter-badge">Q 1 / 10</span>
+        <button id="retire-btn" class="retire-btn" title="リタイアする">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+        <div class="score-display">Score: <span id="current-score">0</span></div>
+      </div>
+      
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+      
+      <!-- コンボバッジ演出用 -->
+      <div id="combo-badge" class="combo-badge hidden">3 COMBO!🔥</div>
+
+      <div class="quiz-content-area">
+        <div class="question-container glass-panel">
+          <div class="category-wrapper">
+            <span id="question-category" class="category-badge">カテゴリ</span>
+            <span id="difficulty-badge" class="difficulty-badge">★☆☆ 基本</span>
+          </div>
+          <h2 id="question-text">ここに問題文が表示されます。</h2>
+        </div>
+
+        <div class="options-grid">
+          <button class="btn option-btn" data-index="0"><span class="opt-label">A</span><span class="opt-text">選択肢 1</span></button>
+          <button class="btn option-btn" data-index="1"><span class="opt-label">B</span><span class="opt-text">選択肢 2</span></button>
+          <button class="btn option-btn" data-index="2"><span class="opt-label">C</span><span class="opt-text">選択肢 3</span></button>
+          <button class="btn option-btn" data-index="3"><span class="opt-label">D</span><span class="opt-text">選択肢 4</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 解説・結果画面 (1問ごとのフィードバック) -->
+    <section id="feedback-screen" class="screen glass-panel">
+      <div class="feedback-scroll-area">
+        <div id="feedback-result" class="feedback-badge correct">正解！</div>
+        <div id="correct-answer-display" class="correct-answer hidden">正解: <span></span></div>
+        <div class="explanation-container">
+          <h3>解説</h3>
+          <p id="explanation-text">ここに解説が表示されます。</p>
+        </div>
+      </div>
+      <button id="next-btn" class="btn btn-primary next-btn-fixed">次の問題へ</button>
+    </section>
+
+    <!-- 最終結果画面 -->
+    <section id="result-screen" class="screen glass-panel">
+      <h1 id="result-title" class="gradient-text" style="margin-top: 20px;">クイズ結果</h1>
+      
+      <!-- 円グラフ風スコア -->
+      <div class="score-ring-container">
+        <svg class="score-ring" width="120" height="120">
+          <circle class="score-circle-bg" cx="60" cy="60" r="45"></circle>
+          <circle class="score-circle-progress" cx="60" cy="60" r="45"></circle>
+        </svg>
+        <div class="score-ring-text">
+          <span id="final-score">0</span><span class="score-denominator">/ 100</span>
+        </div>
+      </div>
+      
+      <p id="result-message" class="result-message">素晴らしい！完璧なリテラシーです。</p>
+      
+      <div class="result-actions" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+        <button id="review-btn" class="btn btn-primary" style="display:none;">間違えた問題を振り返る</button>
+        <button id="retry-btn" class="btn btn-secondary">もう一度挑戦する</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- リタイア確認モーダル -->
+  <div id="retire-modal" class="modal">
+    <div class="modal-content glass-panel">
+      <h3>リタイアしますか？</h3>
+      <p>クイズを途中で終了し、タイトル画面へ戻ります。<br>※ここまでのスコアと記録はすべてリセットされます。</p>
+      <div class="modal-actions">
+        <button id="cancel-retire-btn" class="btn btn-primary">クイズに戻る</button>
+        <button id="confirm-retire-btn" class="btn btn-danger">タイトルへ戻る（破棄）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 振り返り確認モーダル -->
+  <div id="review-modal" class="modal">
+    <div class="modal-content glass-panel review-modal-content">
+      <h3>振り返り（誤答リスト）</h3>
+      <div id="review-list" class="review-list-container"></div>
+      <button id="close-review-btn" class="btn btn-secondary" style="margin-top:8px;">閉じる</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
