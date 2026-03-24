@@ -57,7 +57,8 @@ const dom = {
   reviewList: document.getElementById('review-list'),
   scoreCircle: document.querySelector('.score-circle-progress'),
   resultTitle: document.getElementById('result-title'),
-  difficultyBadge: document.getElementById('difficulty-badge')
+  difficultyBadge: document.getElementById('difficulty-badge'),
+  returnTitleBtn: document.getElementById('return-title-btn')
 };
 
 // Labels for options
@@ -108,6 +109,10 @@ function setupApp() {
   dom.startBtn.addEventListener('click', startQuiz);
   dom.nextBtn.addEventListener('click', handleNextBtn);
   dom.retryBtn.addEventListener('click', resetQuiz);
+  dom.returnTitleBtn.addEventListener('click', () => {
+    isGameOver = false;
+    showScreen('start');
+  });
   
   dom.retireBtn.addEventListener('click', showRetireModal);
   dom.cancelRetireBtn.addEventListener('click', hideRetireModal);
