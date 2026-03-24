@@ -7,6 +7,7 @@ let isGameOver = false;
 
 // 1プレイあたりの出題数（全体からランダムに抽出）
 const MAX_QUESTIONS_PER_PLAY = 10;
+let quizData = []; // CSVから読み込んだ全問題データを格納する配列
 let currentQuizSet = [];
 let wrongAnswersHistory = []; // 誤答履歴の保存
 
@@ -64,6 +65,35 @@ const optionLabels = ['A', 'B', 'C', 'D'];
 
 // Initialization
 function init() {
+  // Load data.csv before initializing the app
+  Papa.parse('data.csv', {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      // 読み込んだCSVデータを quizData 配列フォーマットに変換
+      quizData = results.data.map(row => ({
+        category: row.Category,
+        difficulty: parseInt(row.Difficulty, 10) || 1,
+        question: row.Question,
+        options: [row.Option1, row.Option2, row.Option3, row.Option4],
+        answerIndex: parseInt(row.AnswerIndex, 10) || 0,
+        explanation: row.Explanation
+      }));
+      
+      setupApp();
+    },
+    error: function(err) {
+      console.error("CSV読み込みエラー:", err);
+      dom.questionText.textContent = "問題データの読み込みに失敗しました。";
+    }
+  });
+}
+
+function setupApp() {
+  // CSVデータから一意のカテゴリを抽出してセレクトボックスを動的に構築
+  setupDynamicGenres();
+
   // Update select options with dynamic counts
   const options = dom.genreSelect.querySelectorAll('option');
   options.forEach(opt => {
@@ -88,6 +118,34 @@ function init() {
   
   dom.optionBtns.forEach(btn => {
     btn.addEventListener('click', handleOptionSelect);
+  });
+}
+
+// Extract unique categories and populate the select box
+function setupDynamicGenres() {
+  const categories = [...new Set(quizData.map(q => q.category))].filter(Boolean);
+  
+  // Clear existing options except 'all'
+  dom.genreSelect.innerHTML = '<option value="all">🌐 オールジャンル完全制覇</option>';
+  
+  // スマホUI向けに絵文字を自動マッピング
+  const emojiMap = {
+    '情報セキュリティ': '🛡️',
+    'Windows基礎': '💻',
+    'ショートカットキー': '⌨️',
+    'MS Office基礎': '📝',
+    'ビジネス実務': '👔',
+    'コンプライアンス': '⚖️',
+    'ネットワーク基礎': '📡',
+    'クラウド・最新IT': '☁️'
+  };
+  
+  categories.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    const emoji = emojiMap[cat] || '📋';
+    opt.textContent = `${emoji} ${cat}`;
+    dom.genreSelect.appendChild(opt);
   });
 }
 
